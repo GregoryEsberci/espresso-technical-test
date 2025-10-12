@@ -5,6 +5,11 @@ import { ApiMetadataType } from '../types/metadata';
 import { ROWS_PER_PAGE_OPTIONS } from '../utils/constants';
 import { StatementPageTemplate } from '../components/templates/StatementPageTemplate';
 import { StatementTable } from '../components/organisms/StatementTable';
+import { Typography } from '@mui/material';
+import {
+  ProductChipValue,
+  StatementProductChips,
+} from '../components/organisms/StatementProductChips';
 
 export function StatementPage() {
   const [loading, setLoading] = useState(false);
@@ -14,6 +19,7 @@ export function StatementPage() {
     useState<ApiMetadataType>();
   const [page, setPage] = useState(0);
   const [pageLimit, setPageLimit] = useState(ROWS_PER_PAGE_OPTIONS[0]);
+  const [productType, setProductType] = useState<ProductChipValue>('all');
 
   const fetchStatements = useCallback(
     async (isAborted = (): boolean => false) => {
@@ -24,6 +30,7 @@ export function StatementPage() {
 
         const { data, metadata } = await statementService.list({
           page: page + 1,
+          productType: productType === 'all' ? undefined : productType,
           limit: pageLimit,
         });
 
@@ -39,7 +46,7 @@ export function StatementPage() {
         if (!isAborted()) setLoading(false);
       }
     },
-    [page, pageLimit],
+    [page, pageLimit, productType],
   );
 
   useEffect(() => {
@@ -66,6 +73,8 @@ export function StatementPage() {
 
   return (
     <StatementPageTemplate>
+      <Typography variant="h5">Extrato</Typography>
+      <StatementProductChips onSelect={setProductType} selected={productType} />
       <StatementTable
         statements={statements}
         totalCount={statementsMetadata?.count || 0}
@@ -73,7 +82,7 @@ export function StatementPage() {
         onPageChange={handlePageChange}
         rowsPerPage={pageLimit}
         onRowsPerPageChange={handleRowsPerPageChange}
-          loading={loading}
+        loading={loading}
       />
     </StatementPageTemplate>
   );
