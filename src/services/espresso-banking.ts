@@ -1,5 +1,5 @@
 import axios from 'axios';
-import HttpService from './http-service';
+import { HttpService } from './http-service';
 
 class EspressoBankingService extends HttpService {
   constructor() {
@@ -13,4 +13,4 @@ class EspressoBankingService extends HttpService {
   }
 }
 
-export default new EspressoBankingService();
+export const espressoBankingService = new EspressoBankingService();

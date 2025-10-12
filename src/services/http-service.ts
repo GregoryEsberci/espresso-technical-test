@@ -1,6 +1,6 @@
 import { Axios, AxiosRequestConfig } from 'axios';
 
-class HttpService {
+export class HttpService {
   constructor(protected axios: Axios) {}
 
   async get<T>(url: string, config?: AxiosRequestConfig) {
@@ -31,5 +31,3 @@ class HttpService {
     return this.axios.options<T>(url, config);
   }
 }
-
-export default HttpService;

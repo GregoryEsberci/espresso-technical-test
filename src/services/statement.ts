@@ -1,5 +1,5 @@
 import { mapKeys, snakeCase } from 'lodash';
-import espressoBankingService from './espresso-banking';
+import { espressoBankingService } from './espresso-banking';
 import { StatementType, StatementProductType } from '../types/statement';
 import { ApiResponse } from '../types/metadata';
 
@@ -25,4 +25,4 @@ type ListParams = {
   limit?: number;
 };
 
-export default new StatementService();
+export const statementService = new StatementService();
