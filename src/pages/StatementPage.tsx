@@ -60,10 +60,6 @@ export function StatementPage() {
     setPage(0);
   };
 
-  if (loading) {
-    return <h1>Carregando...</h1>;
-  }
-
   if (hasFetchError) {
     return <h1>Falha ao carregar os dados</h1>;
   }
@@ -77,6 +73,7 @@ export function StatementPage() {
         onPageChange={handlePageChange}
         rowsPerPage={pageLimit}
         onRowsPerPageChange={handleRowsPerPageChange}
+          loading={loading}
       />
     </StatementPageTemplate>
   );

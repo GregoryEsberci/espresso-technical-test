@@ -22,7 +22,7 @@ export function StatementTableRow({ statement }: StatementTableRowProps) {
     <TableRow>
       <TableCell>{formattedDate}</TableCell>
       <TableCell>{statement.description}</TableCell>
-      <TableCell align="right">
+      <TableCell>
         <Typography
           variant="body2"
           color={STATEMENT_TRANSACTION_COLOR[statement.transaction_type]}

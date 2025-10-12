@@ -13,6 +13,8 @@ import {
 import { StatementType } from '../../types/statement';
 import { StatementTableRow } from './StatementTableRow';
 import { ROWS_PER_PAGE_OPTIONS } from '../../utils/constants';
+import { times } from 'lodash';
+import { StatementTableRowSkeleton } from './StatementTableRowSkeleton';
 
 const labelDisplayedRows = ({ from, to, count }: LabelDisplayedRowsArgs) =>
   `${from}–${to} de ${count}`;
@@ -22,6 +24,7 @@ export function StatementTable({
   totalCount,
   page,
   rowsPerPage,
+  loading,
   onPageChange,
   onRowsPerPageChange,
 }: StatementTableProps) {
@@ -32,15 +35,19 @@ export function StatementTable({
           <TableRow>
             <TableCell>Data</TableCell>
             <TableCell>Descrição</TableCell>
-            <TableCell align="right">Valor R$</TableCell>
+            <TableCell>Valor R$</TableCell>
             <TableCell>Responsável</TableCell>
             <TableCell>Produto</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {statements.map((statement) => (
-              <StatementTableRow key={statement.id} statement={statement} />
-            ))}
+          {loading
+            ? times(rowsPerPage, (index) => (
+                <StatementTableRowSkeleton key={index} />
+              ))
+            : statements.map((statement) => (
+                <StatementTableRow key={statement.id} statement={statement} />
+              ))}
         </TableBody>
         <TableFooter>
           <TableRow>
@@ -68,6 +75,7 @@ type StatementTableProps = {
   totalCount: number;
   page: number;
   rowsPerPage: number;
+  loading: boolean;
   onPageChange: (newPage: number) => void;
   onRowsPerPageChange: (newRowsPerPage: number) => void;
 };
