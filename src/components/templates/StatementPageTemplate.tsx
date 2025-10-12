@@ -1,13 +1,16 @@
-import { Box, ThemeProvider } from '@mui/material';
-import { theme } from '../../theme';
+import { Box } from '@mui/material';
+import { PageHeader } from '../molecules/PageHeader';
 
 export function StatementPageTemplate({
   children,
 }: StatementPageTemplateProps) {
   return (
-    <ThemeProvider theme={theme}>
-      <Box sx={{ margin: 10, marginLeft: 22, marginRight: 22 }}>{children}</Box>
-    </ThemeProvider>
+    <Box>
+      <PageHeader />
+      <Box margin={10} marginLeft={22} marginRight={22}>
+        {children}
+      </Box>
+    </Box>
   );
 }
 
