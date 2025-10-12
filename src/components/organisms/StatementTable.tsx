@@ -30,19 +30,17 @@ export function StatementTable({
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell sx={{ fontWeight: 'bold' }}>Data</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>Descrição</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }} align="right">
-              Valor R$
-            </TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>Responsável</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>Produto</TableCell>
+            <TableCell>Data</TableCell>
+            <TableCell>Descrição</TableCell>
+            <TableCell align="right">Valor R$</TableCell>
+            <TableCell>Responsável</TableCell>
+            <TableCell>Produto</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {statements.map((statement) => (
-            <StatementTableRow key={statement.id} statement={statement} />
-          ))}
+              <StatementTableRow key={statement.id} statement={statement} />
+            ))}
         </TableBody>
         <TableFooter>
           <TableRow>
