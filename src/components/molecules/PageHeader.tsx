@@ -3,10 +3,13 @@ import { Logo } from '../atoms/Logo';
 
 export function PageHeader() {
   return (
-    <AppBar position="fixed">
-      <Toolbar>
-        <Logo />
-      </Toolbar>
-    </AppBar>
+    <>
+      <AppBar position="fixed">
+        <Toolbar>
+          <Logo />
+        </Toolbar>
+      </AppBar>
+      <Toolbar />
+    </>
   );
 }

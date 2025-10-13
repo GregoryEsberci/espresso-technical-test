@@ -64,7 +64,9 @@ export function StatementPage() {
 
   return (
     <StatementPageTemplate>
-      <Typography variant="h5">Extrato</Typography>
+      <Typography variant="h5" sx={{ mb: 3 }}>
+        Extrato
+      </Typography>
       <StatementProductChips onSelect={setProductType} selected={productType} />
       <StatementChart
         loading={chartState.loading}

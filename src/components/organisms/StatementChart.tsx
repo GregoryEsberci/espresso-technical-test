@@ -5,6 +5,7 @@ import {
   CircularProgress,
   Paper,
   Typography,
+  useMediaQuery,
   useTheme,
 } from '@mui/material';
 import { EMPTY } from '../../utils/constants';
@@ -12,10 +13,11 @@ import { NorthEast, SouthEast } from '@mui/icons-material';
 import { TotalAmount } from '../molecules/TotalAmount';
 import { MonthSelect } from '../molecules/MonthSelect';
 import { SummarizedStatements } from '../../utils/sumarize-statements';
+import { memo, useMemo } from 'react';
 
-const HEIGHT = 300;
+const HEIGHT = 200;
 
-export function StatementChart({
+export const StatementChart = memo(function StatementChart({
   summarizedStatements,
   selectedMonth,
   setSelectedMonth,
@@ -24,9 +26,25 @@ export function StatementChart({
   const { chartData, totalCredit, totalDebit } = summarizedStatements || {};
   const theme = useTheme();
 
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+
+  const chartMargins = useMemo(() => {
+    if (isMobile) return { left: 0, right: 0 };
+    if (isTablet) return { left: 10, right: 10 };
+    return { left: 35, right: 35 };
+  }, [isMobile, isTablet]);
+
   return (
-    <Paper sx={{ padding: 3 }}>
-      <Box display="flex" justifyContent="space-between">
+    <Paper sx={{ p: 2, px: 3, my: 3 }}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        flexDirection={{ xs: 'column', sm: 'row' }}
+        gap={{ xs: 1, sm: 0 }}
+        marginBottom={{ xs: 1, sm: 0 }}
+        alignItems={{ xs: 'flex-start', sm: 'center' }}
+      >
         <Typography variant="h5">Resumo de movimentações</Typography>
         <MonthSelect
           onChange={setSelectedMonth}
@@ -34,9 +52,9 @@ export function StatementChart({
           disabled={loading}
         />
       </Box>
-      <Box display="flex" gap={2}>
+      <Box display="flex" gap={3}>
         <TotalAmount
-          icon={<NorthEast color="info" />}
+          icon={<NorthEast color="primary" />}
           value={totalCredit ?? 0}
           loading={loading}
         />
@@ -59,7 +77,7 @@ export function StatementChart({
         </Box>
       ) : (
         <LineChart
-          margin={{ left: 35, right: 35 }}
+          margin={chartMargins}
           xAxis={[
             {
               dataKey: 'day',
@@ -68,6 +86,7 @@ export function StatementChart({
               tickLabelInterval: (value) => (value - 1) % 9 === 0,
               disableTicks: true,
               disableLine: true,
+              tickLabelStyle: { fill: theme.palette.text.secondary },
             },
           ]}
           yAxis={[
@@ -91,7 +110,7 @@ export function StatementChart({
       )}
     </Paper>
   );
-}
+});
 
 type StatementChartProps = {
   summarizedStatements: SummarizedStatements | undefined;

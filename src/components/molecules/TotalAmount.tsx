@@ -8,7 +8,7 @@ export function TotalAmount({ icon, value, loading }: TotalAmountProps) {
   );
 
   return (
-    <Box display="flex" alignItems="center">
+    <Box display="flex" alignItems="center" gap={1}>
       {icon}
       {loading ? (
         <Skeleton width={120} />

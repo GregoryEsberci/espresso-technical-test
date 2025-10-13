@@ -3,8 +3,8 @@ import { createTheme } from '@mui/material';
 export const theme = createTheme({
   palette: {
     primary: {
-      // TODO: O select de Linhas por página ficou estranho
-      main: '#3D0079',
+      // Usando essa cor pois a que está nos Assets como primaria não é usada e ela aparece como primary/main no Tete
+      main: '#2196F3',
     },
     background: {
       default: '#FBFAFC',

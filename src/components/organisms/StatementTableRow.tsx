@@ -1,4 +1,4 @@
-import { TableRow, TableCell, Typography } from '@mui/material';
+import { TableRow, TableCell, Typography, Box, useTheme } from '@mui/material';
 import { StatementType, StatementTransactionType } from '../../types/statement';
 import {
   STATEMENT_TRANSACTION_LABEL,
@@ -6,16 +6,24 @@ import {
   STATEMENT_PRODUCT_LABEL,
   STATEMENT_PRODUCT_ICON,
 } from '../../utils/constants';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import dayjs from 'dayjs';
 
-export function StatementTableRow({ statement }: StatementTableRowProps) {
+export const StatementTableRow = memo(function StatementTableRow({
+  statement,
+}: StatementTableRowProps) {
+  const theme = useTheme();
   const ProductIcon = STATEMENT_PRODUCT_ICON[statement.product_type];
   const isDebit = statement.transaction_type === StatementTransactionType.Debit;
 
   const formattedDate = useMemo(
     () => dayjs(statement.transaction_date).format('DD/MM/YYYY [às] HH:mm:ss'),
     [statement.transaction_date],
+  );
+
+  const formattedAmount = useMemo(
+    () => Intl.NumberFormat('pt-br').format(+statement.amount),
+    [statement.amount],
   );
 
   return (
@@ -28,7 +36,7 @@ export function StatementTableRow({ statement }: StatementTableRowProps) {
           color={STATEMENT_TRANSACTION_COLOR[statement.transaction_type]}
         >
           {isDebit && '-'}
-          {statement.amount}
+          {formattedAmount}
         </Typography>
         <Typography variant="body2" color="textSecondary">
           {STATEMENT_TRANSACTION_LABEL[statement.transaction_type]}
@@ -36,12 +44,14 @@ export function StatementTableRow({ statement }: StatementTableRowProps) {
       </TableCell>
       <TableCell>{statement.username}</TableCell>
       <TableCell>
-        <ProductIcon /> {STATEMENT_PRODUCT_LABEL[statement.product_type]}
+        <Box display="flex" alignItems="center" gap={1}>
+          <ProductIcon sx={{ color: theme.palette.text.secondary }} />
+          {STATEMENT_PRODUCT_LABEL[statement.product_type]}
+        </Box>
       </TableCell>
     </TableRow>
   );
-}
-
+});
 type StatementTableRowProps = {
   statement: StatementType;
 };

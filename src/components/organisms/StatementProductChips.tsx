@@ -11,7 +11,7 @@ export function StatementProductChips({
   selected,
 }: StatementProductChipsProps) {
   return (
-    <Box gap={2} display="flex">
+    <Box gap={2} display="flex" flexWrap="wrap">
       {PRODUCT_CHIPS.map(({ label, value, Icon }) => (
         <Chip
           sx={{ height: 50, padding: 1.5, borderRadius: 6 }}

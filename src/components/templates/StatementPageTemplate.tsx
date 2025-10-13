@@ -7,7 +7,7 @@ export function StatementPageTemplate({
   return (
     <Box>
       <PageHeader />
-      <Box margin={10} marginLeft={22} marginRight={22}>
+      <Box my={4} mx={{ xs: 2, sm: 4, md: 22 }}>
         {children}
       </Box>
     </Box>
