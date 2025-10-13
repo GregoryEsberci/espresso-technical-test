@@ -30,6 +30,10 @@ export default defineConfig([
     },
     rules: {
       'prettier/prettier': ['error', { singleQuote: true }],
+      'react-hooks/exhaustive-deps': [
+        'warn',
+        { additionalHooks: '(useAsync)' },
+      ],
     },
   },
 ]);

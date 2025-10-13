@@ -29,3 +29,5 @@ export const STATEMENT_PRODUCT_ICON = {
 };
 
 export const ROWS_PER_PAGE_OPTIONS = [7, 10, 15, 20];
+
+export const EMPTY = { array: [], object: {} };

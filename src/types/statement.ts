@@ -3,7 +3,7 @@ export interface StatementType {
   description: string;
   amount: string;
   transaction_type: StatementTransactionType;
-  transaction_date: Date;
+  transaction_date: string;
   username: string;
   product_type: StatementProductType;
 }

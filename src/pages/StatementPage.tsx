@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
-import { StatementType } from '../types/statement';
+import { useState } from 'react';
 import { statementService } from '../services/statement';
-import { ApiMetadataType } from '../types/metadata';
-import { ROWS_PER_PAGE_OPTIONS } from '../utils/constants';
+import { EMPTY, ROWS_PER_PAGE_OPTIONS } from '../utils/constants';
 import { StatementPageTemplate } from '../components/templates/StatementPageTemplate';
 import { StatementTable } from '../components/organisms/StatementTable';
 import { Typography } from '@mui/material';
@@ -10,79 +8,78 @@ import {
   ProductChipValue,
   StatementProductChips,
 } from '../components/organisms/StatementProductChips';
+import useAsync from '../hooks/useAsync';
+import { StatementChart } from '../components/organisms/StatementChart';
+import dayjs from 'dayjs';
+import { INITIAL_MONTH_SELECT_DATE } from '../components/molecules/MonthSelect';
+import { sumarizeStatements } from '../utils/sumarize-statements';
 
 export function StatementPage() {
-  const [loading, setLoading] = useState(false);
-  const [hasFetchError, setHasFetchError] = useState(false);
-  const [statements, setStatements] = useState<StatementType[]>([]);
-  const [statementsMetadata, setStatementsMetadata] =
-    useState<ApiMetadataType>();
-  const [page, setPage] = useState(0);
-  const [pageLimit, setPageLimit] = useState(ROWS_PER_PAGE_OPTIONS[0]);
+  const [tablePage, setTablePage] = useState(0);
+  const [tablePageLimit, setTablePageLimit] = useState(
+    ROWS_PER_PAGE_OPTIONS[0],
+  );
   const [productType, setProductType] = useState<ProductChipValue>('all');
-
-  const fetchStatements = useCallback(
-    async (isAborted = (): boolean => false) => {
-      try {
-        setStatements([]);
-        setLoading(true);
-        setHasFetchError(false);
-
-        const { data, metadata } = await statementService.list({
-          page: page + 1,
-          productType: productType === 'all' ? undefined : productType,
-          limit: pageLimit,
-        });
-
-        if (isAborted()) return;
-
-        setStatementsMetadata(metadata);
-        setStatements(data);
-      } catch (error) {
-        console.error(error);
-
-        if (!isAborted()) setHasFetchError(true);
-      } finally {
-        if (!isAborted()) setLoading(false);
-      }
-    },
-    [page, pageLimit, productType],
+  const [selectedChartMonth, setSelectedChartMonth] = useState(
+    INITIAL_MONTH_SELECT_DATE,
   );
 
-  useEffect(() => {
-    let aborted = false;
-    fetchStatements(() => aborted);
+  const tableState = useAsync(
+    async () =>
+      statementService.list({
+        page: tablePage + 1,
+        productType: productType === 'all' ? undefined : productType,
+        limit: tablePageLimit,
+      }),
+    [tablePage, tablePageLimit, productType],
+  );
 
-    return () => {
-      aborted = true;
-    };
-  }, [fetchStatements]);
+  const chartState = useAsync(async () => {
+    const startDate = dayjs(selectedChartMonth)
+      .startOf('month')
+      .format('YYYY-MM-DD');
+    const endDate = dayjs(selectedChartMonth)
+      .endOf('month')
+      .format('YYYY-MM-DD');
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+    const allStatements = await statementService.listAll({
+      productType: productType === 'all' ? undefined : productType,
+      startDate,
+      endDate,
+    });
+
+    if (allStatements.length === 0) return;
+
+    return sumarizeStatements(selectedChartMonth, allStatements);
+  }, [selectedChartMonth, productType]);
+
+  const handleTablePageChange = (newPage: number) => {
+    setTablePage(newPage);
   };
 
-  const handleRowsPerPageChange = (newRowsPerPage: number) => {
-    setPageLimit(newRowsPerPage);
-    setPage(0);
+  const handleTableRowsPerPageChange = (newRowsPerPage: number) => {
+    setTablePageLimit(newRowsPerPage);
+    setTablePage(0);
   };
-
-  if (hasFetchError) {
-    return <h1>Falha ao carregar os dados</h1>;
-  }
 
   return (
     <StatementPageTemplate>
       <Typography variant="h5">Extrato</Typography>
       <StatementProductChips onSelect={setProductType} selected={productType} />
+      <StatementChart
+        loading={chartState.loading}
+        selectedMonth={selectedChartMonth}
+        setSelectedMonth={setSelectedChartMonth}
+        summarizedStatements={chartState.data}
+      />
       <StatementTable
-        statements={statements}
-        totalCount={statementsMetadata?.count || 0}
-        page={page}
-        onPageChange={handlePageChange}
-        rowsPerPage={pageLimit}
-        onRowsPerPageChange={handleRowsPerPageChange}
-        loading={loading}
+        statements={tableState.data?.data || EMPTY.array}
+        totalCount={tableState.data?.metadata?.count || 0}
+        page={tablePage}
+        onPageChange={handleTablePageChange}
+        rowsPerPage={tablePageLimit}
+        onRowsPerPageChange={handleTableRowsPerPageChange}
+        loading={tableState.loading}
       />
     </StatementPageTemplate>
   );
