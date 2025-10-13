@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { times, chain, sortBy } from 'lodash';
+import { times } from 'lodash';
 import { StatementTransactionType, StatementType } from '../types/statement';
 
 // Em um caso real sugeriria um endpoint novo que retornasse os dados já sumarizados
@@ -7,55 +7,67 @@ export const sumarizeStatements = (
   monthDate: Date,
   statements: StatementType[],
 ): SummarizedStatements => {
-  // Pra garantir que todos dias do mês sejam exibidos mesmo se não tiver dados
-  const initialIndexedDebits = times(
-    dayjs(monthDate).endOf('month').date(),
-  ).reduce<Record<string, number>>((acc, day) => {
-    acc[(day + 1).toString()] = 0;
+  const initialIndexedDebits = initializeIndexedDebits(monthDate);
 
-    return acc;
-  }, {});
+  const { indexedDebits, totalCredit, totalDebit } = statements.reduce(
+    (acc, statement) => {
+      const amount = +statement.amount;
+      const transactionType = statement.transaction_type;
 
-  return chain(statements)
-    .reduce(
-      (acc, statement) => {
-        const amount = +statement.amount;
+      if (transactionType === StatementTransactionType.Credit) {
+        acc.totalCredit += amount;
+      } else if (transactionType === StatementTransactionType.Debit) {
+        const indexedDebitKey = getIndexedDebitsKey(
+          dayjs.utc(statement.transaction_date),
+        );
 
-        if (statement.transaction_type === StatementTransactionType.Credit) {
-          acc.totalCredit += amount;
-        }
+        acc.totalDebit += amount;
+        acc.indexedDebits[indexedDebitKey] ??= 0; // Na teoria não precisaria, está aqui apenas pra ser tolerante a falhas
+        acc.indexedDebits[indexedDebitKey] += amount;
+      }
 
-        if (statement.transaction_type === StatementTransactionType.Debit) {
-          // Usando apenas o dia já que os dados são apenas de um mes e assim não precisa formatar a data,
-          // oque seria mais pesado e poderia se tornar um problema visto a quantidade de registros
-          const transactionDay = new Date(statement.transaction_date)
-            .getDate()
-            .toString();
+      return acc;
+    },
+    { indexedDebits: initialIndexedDebits, totalDebit: 0, totalCredit: 0 },
+  );
 
-          acc.totalDebit += amount;
-          acc.indexedDebits[transactionDay] ??= 0;
-          acc.indexedDebits[transactionDay] += amount;
-        }
-
-        return acc;
-      },
-      { indexedDebits: initialIndexedDebits, totalDebit: 0, totalCredit: 0 },
-    )
-    .thru(({ indexedDebits, ...rest }) => {
-      let chartData = Object.entries(indexedDebits).map(([day, amount]) => ({
-        day: +day,
-        amount,
-      }));
-
-      chartData = sortBy(chartData, 'day');
-
-      return { ...rest, chartData };
-    })
-    .value();
+  return {
+    totalDebit,
+    totalCredit,
+    chartData: buildChartData(indexedDebits),
+  };
 };
 
+const getIndexedDebitsKey = (date: dayjs.ConfigType) =>
+  dayjs.utc(date).startOf('day').toISOString();
+
+// Pra garantir que todos dias do mes sejam exibidos mesmo se não tiver dados
+const initializeIndexedDebits = (monthDate: Date) => {
+  const monthDayjs = dayjs.utc(monthDate);
+  const daysInMonth = monthDayjs.daysInMonth();
+  const startOfMonth = monthDayjs.startOf('month');
+  const indexedDebits: Record<string, number> = {};
+
+  times(daysInMonth, (day) => {
+    const key = getIndexedDebitsKey(startOfMonth.add(day, 'days'));
+    indexedDebits[key] = 0;
+  });
+
+  return indexedDebits;
+};
+
+const buildChartData = (indexedDebits: Record<string, number>): ChartData[] =>
+  Object.entries(indexedDebits)
+    .map(([dateString, amount]) => ({
+      date: new Date(dateString),
+      amount,
+    }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+type ChartData = { date: Date; amount: number };
+
 export type SummarizedStatements = {
-  chartData: { day: number; amount: number }[];
+  chartData: ChartData[];
   totalDebit: number;
   totalCredit: number;
 };

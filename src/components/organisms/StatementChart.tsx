@@ -80,10 +80,11 @@ export const StatementChart = memo(function StatementChart({
           margin={chartMargins}
           xAxis={[
             {
-              dataKey: 'day',
+              dataKey: 'date',
               valueFormatter: (value: number) =>
-                dayjs(selectedMonth).date(value).format('D [de] MMM'),
-              tickLabelInterval: (value) => (value - 1) % 9 === 0,
+                dayjs.utc(value).format('D [de] MMM'),
+              tickLabelInterval: (_value, index) => index % 9 === 0,
+              scaleType: 'utc',
               disableTicks: true,
               disableLine: true,
               tickLabelStyle: { fill: theme.palette.text.secondary },

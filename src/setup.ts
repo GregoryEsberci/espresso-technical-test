@@ -4,6 +4,8 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import 'dayjs/locale/pt-br';
 
 dayjs.locale('pt-br');
+dayjs.extend(utc);

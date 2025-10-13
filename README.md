@@ -1,5 +1,9 @@
 # Getting Started with Create React App
 
+## Observação sobre timezone
+
+Ao filtrar os dados do gráfico (nos formatos YYYY-MM-DD ou ISO), alguns registros podem aparecer no mês anterior se converter para o timezone local, por isso decidir exibir as datas em UTC para manter consistência, se fossem exibidas no timezone local o gráfico poderia mostrar registros do ultimo dia do mês anterior, por exemplo Setembro (`start_date=2025-09-01&end_date=2025-09-30` ou `start_date=2025-09-01T03:00:00.000Z&end_date=2025-10-01T02:59:59.999Z`) que retorna o registro com `ID` `cce0404e-0ffb-43d7-a099-a4bc856d1437` e `transaction_date` `2025-09-01T02:47:31.829Z`.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

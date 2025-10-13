@@ -35,10 +35,12 @@ export function StatementPage() {
   );
 
   const chartState = useAsync(async () => {
-    const startDate = dayjs(selectedChartMonth)
+    const startDate = dayjs
+      .utc(selectedChartMonth)
       .startOf('month')
       .format('YYYY-MM-DD');
-    const endDate = dayjs(selectedChartMonth)
+    const endDate = dayjs
+      .utc(selectedChartMonth)
       .endOf('month')
       .format('YYYY-MM-DD');
 

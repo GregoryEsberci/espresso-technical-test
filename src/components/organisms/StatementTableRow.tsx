@@ -17,7 +17,8 @@ export const StatementTableRow = memo(function StatementTableRow({
   const isDebit = statement.transaction_type === StatementTransactionType.Debit;
 
   const formattedDate = useMemo(
-    () => dayjs(statement.transaction_date).format('DD/MM/YYYY [às] HH:mm:ss'),
+    () =>
+      dayjs.utc(statement.transaction_date).format('DD/MM/YYYY [às] HH:mm:ss'),
     [statement.transaction_date],
   );
 
