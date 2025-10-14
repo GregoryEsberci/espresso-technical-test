@@ -4,12 +4,12 @@ import dayjs from 'dayjs';
 import { capitalize, times } from 'lodash';
 
 export const INITIAL_MONTH_SELECT_DATE = dayjs
-  .utc('2025-09-01')
+  .utc('2025-07-01')
   .startOf('month')
   .toDate();
 
 const MONTH_SELECT_OPTIONS = times(3).map((index) => {
-  const date = dayjs.utc(INITIAL_MONTH_SELECT_DATE).subtract(index, 'months');
+  const date = dayjs.utc(INITIAL_MONTH_SELECT_DATE).add(index, 'months');
 
   return {
     value: date.valueOf(),
