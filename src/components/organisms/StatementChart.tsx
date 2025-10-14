@@ -4,6 +4,7 @@ import {
   Box,
   CircularProgress,
   Paper,
+  styled,
   Typography,
   useMediaQuery,
   useTheme,
@@ -17,13 +18,10 @@ import { memo, useMemo } from 'react';
 
 const HEIGHT = 200;
 
-export const StatementChart = memo(function StatementChart({
-  summarizedStatements,
-  selectedMonth,
-  setSelectedMonth,
-  loading,
-}: StatementChartProps) {
-  const { chartData, totalCredit, totalDebit } = summarizedStatements || {};
+export const StatementChart = memo(function StatementChart(
+  props: StatementChartProps,
+) {
+  const { loading, error, summarizedStatements } = props;
   const theme = useTheme();
 
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -35,8 +33,78 @@ export const StatementChart = memo(function StatementChart({
     return { left: 35, right: 35 };
   }, [isMobile, isTablet]);
 
+  const renderChartContent = () => {
+    if (loading) {
+      return (
+        <ChartPlaceholder>
+          <CircularProgress />
+        </ChartPlaceholder>
+      );
+    }
+
+    if (error) {
+      return (
+        <ChartPlaceholder>
+          <Typography>Falha ao carregar as movimentações</Typography>
+        </ChartPlaceholder>
+      );
+    }
+
+    return (
+      <LineChart
+        margin={chartMargins}
+        xAxis={[
+          {
+            dataKey: 'date',
+            valueFormatter: (value: number) =>
+              dayjs.utc(value).format('D [de] MMM'),
+            tickLabelInterval: (_value, index) => index % 9 === 0,
+            scaleType: 'utc',
+            disableTicks: true,
+            disableLine: true,
+            tickLabelStyle: { fill: theme.palette.text.secondary },
+          },
+        ]}
+        yAxis={[
+          {
+            disableTicks: true,
+            disableLine: true,
+            valueFormatter: () => '',
+            width: 0,
+          },
+        ]}
+        series={[
+          {
+            dataKey: 'amount',
+            showMark: false,
+            color: theme.palette.error.light,
+          },
+        ]}
+        height={HEIGHT}
+        dataset={summarizedStatements?.chartData || EMPTY.array}
+        slotProps={{
+          noDataOverlay: { message: 'Nenhuma movimentação encontrada' },
+        }}
+      />
+    );
+  };
+
   return (
     <Paper sx={{ p: 2, px: 3, my: 3 }}>
+      <ChartHeader {...props} />
+      {renderChartContent()}
+    </Paper>
+  );
+});
+
+function ChartHeader({
+  loading,
+  selectedMonth,
+  setSelectedMonth,
+  summarizedStatements,
+}: StatementChartProps) {
+  return (
+    <>
       <Box
         display="flex"
         justifyContent="space-between"
@@ -55,66 +123,30 @@ export const StatementChart = memo(function StatementChart({
       <Box display="flex" gap={3}>
         <TotalAmount
           icon={<NorthEast color="primary" />}
-          value={totalCredit ?? 0}
+          value={summarizedStatements?.totalCredit ?? 0}
           loading={loading}
         />
         <TotalAmount
           icon={<SouthEast color="error" />}
-          value={totalDebit ?? 0}
+          value={summarizedStatements?.totalDebit ?? 0}
           loading={loading}
         />
       </Box>
-
-      {loading ? (
-        <Box
-          height={HEIGHT}
-          width="100%"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <CircularProgress />
-        </Box>
-      ) : (
-        <LineChart
-          margin={chartMargins}
-          xAxis={[
-            {
-              dataKey: 'date',
-              valueFormatter: (value: number) =>
-                dayjs.utc(value).format('D [de] MMM'),
-              tickLabelInterval: (_value, index) => index % 9 === 0,
-              scaleType: 'utc',
-              disableTicks: true,
-              disableLine: true,
-              tickLabelStyle: { fill: theme.palette.text.secondary },
-            },
-          ]}
-          yAxis={[
-            {
-              disableTicks: true,
-              disableLine: true,
-              valueFormatter: () => '',
-              width: 0,
-            },
-          ]}
-          series={[
-            {
-              dataKey: 'amount',
-              showMark: false,
-              color: theme.palette.error.light,
-            },
-          ]}
-          height={HEIGHT}
-          dataset={chartData || EMPTY.array}
-        />
-      )}
-    </Paper>
+    </>
   );
+}
+
+const ChartPlaceholder = styled(Box)({
+  height: HEIGHT,
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 });
 
 type StatementChartProps = {
   summarizedStatements: SummarizedStatements | undefined;
+  error: unknown;
   loading: boolean;
   setSelectedMonth: (date: Date) => void;
   selectedMonth: Date;

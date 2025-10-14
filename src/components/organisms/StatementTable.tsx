@@ -25,9 +25,40 @@ export function StatementTable({
   page,
   rowsPerPage,
   loading,
+  error,
   onPageChange,
   onRowsPerPageChange,
 }: StatementTableProps) {
+  const renderTableBody = () => {
+    if (loading) {
+      return times(rowsPerPage, (index) => (
+        <StatementTableRowSkeleton key={index} />
+      ));
+    }
+
+    let message: string | undefined;
+
+    if (error) {
+      message = 'Falha ao carregar as movimentações';
+    } else if (statements.length === 0) {
+      message = 'Nenhuma movimentação encontrada';
+    }
+
+    if (message) {
+      return (
+        <TableRow>
+          <TableCell colSpan={5} align="center">
+            {message}
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    return statements.map((statement) => (
+      <StatementTableRow key={statement.id} statement={statement} />
+    ));
+  };
+
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -40,15 +71,7 @@ export function StatementTable({
             <TableCell>Produto</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {loading
-            ? times(rowsPerPage, (index) => (
-                <StatementTableRowSkeleton key={index} />
-              ))
-            : statements.map((statement) => (
-                <StatementTableRow key={statement.id} statement={statement} />
-              ))}
-        </TableBody>
+        <TableBody>{renderTableBody()}</TableBody>
         <TableFooter>
           <TableRow>
             <TablePagination
@@ -76,6 +99,7 @@ type StatementTableProps = {
   page: number;
   rowsPerPage: number;
   loading: boolean;
+  error: unknown;
   onPageChange: (newPage: number) => void;
   onRowsPerPageChange: (newRowsPerPage: number) => void;
 };

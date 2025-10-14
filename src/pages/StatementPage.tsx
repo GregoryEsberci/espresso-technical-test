@@ -72,9 +72,10 @@ export function StatementPage() {
       <StatementProductChips onSelect={setProductType} selected={productType} />
       <StatementChart
         loading={chartState.loading}
+        summarizedStatements={chartState.data}
+        error={chartState.error}
         selectedMonth={selectedChartMonth}
         setSelectedMonth={setSelectedChartMonth}
-        summarizedStatements={chartState.data}
       />
       <StatementTable
         statements={tableState.data?.data || EMPTY.array}
@@ -84,6 +85,7 @@ export function StatementPage() {
         rowsPerPage={tablePageLimit}
         onRowsPerPageChange={handleTableRowsPerPageChange}
         loading={tableState.loading}
+        error={tableState.error}
       />
     </StatementPageTemplate>
   );
