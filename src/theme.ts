@@ -3,7 +3,7 @@ import { createTheme } from '@mui/material';
 export const theme = createTheme({
   palette: {
     primary: {
-      // Usando essa cor pois a que está nos Assets como primaria não é usada e ela aparece como primary/main no Tete
+      // Usando essa cor pois a que esta nos Assets como primaria não aparece no Teste, mas essa esta como primary/main nele
       main: '#2196F3',
     },
     background: {
@@ -11,7 +11,7 @@ export const theme = createTheme({
     },
     action: {
       selected: '#F0EBF5',
-      selectedOpacity: 1,
+      selectedOpacity: 0.75,
     },
   },
   components: {
