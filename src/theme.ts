@@ -1,3 +1,4 @@
+import type {} from '@mui/x-charts/themeAugmentation';
 import { createTheme } from '@mui/material';
 
 export const theme = createTheme({

@@ -14,7 +14,7 @@ import { NorthEast, SouthEast } from '@mui/icons-material';
 import { TotalAmount } from '../molecules/TotalAmount';
 import { MonthSelect } from '../molecules/MonthSelect';
 import { SummarizedStatements } from '../../utils/sumarize-statements';
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 
 const HEIGHT = 200;
 
@@ -27,11 +27,19 @@ export const StatementChart = memo(function StatementChart(
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
-  const chartMargins = useMemo(() => {
-    if (isMobile) return { left: 0, right: 0 };
-    if (isTablet) return { left: 10, right: 10 };
-    return { left: 35, right: 35 };
-  }, [isMobile, isTablet]);
+  const tickLabelInterval = (_value: Date, index: number) => {
+    let interval = 0;
+
+    if (isMobile) {
+      interval = 2;
+    } else if (isTablet) {
+      interval = 6;
+    } else {
+      interval = 9;
+    }
+
+    return index % interval === 0;
+  };
 
   const renderChartContent = () => {
     if (loading) {
@@ -52,17 +60,20 @@ export const StatementChart = memo(function StatementChart(
 
     return (
       <LineChart
-        margin={chartMargins}
+        margin={{ left: 5, right: 5 }}
         xAxis={[
           {
             dataKey: 'date',
             valueFormatter: (value: number) =>
               dayjs.utc(value).format('D [de] MMM'),
-            tickLabelInterval: (_value, index) => index % 9 === 0,
+            tickLabelInterval,
             scaleType: 'utc',
             disableTicks: true,
             disableLine: true,
-            tickLabelStyle: { fill: theme.palette.text.secondary },
+            tickLabelStyle: {
+              fill: theme.palette.text.secondary,
+              textAnchor: 'start',
+            },
           },
         ]}
         yAxis={[
@@ -120,7 +131,7 @@ function ChartHeader({
           disabled={loading}
         />
       </Box>
-      <Box display="flex" gap={3}>
+      <Box display="flex" flexWrap="wrap" columnGap={3}>
         <TotalAmount
           icon={<NorthEast color="primary" />}
           value={summarizedStatements?.totalCredit ?? 0}

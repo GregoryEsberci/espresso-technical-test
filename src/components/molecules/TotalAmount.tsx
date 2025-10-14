@@ -11,7 +11,7 @@ export function TotalAmount({ icon, value, loading }: TotalAmountProps) {
     <Box display="flex" alignItems="center" gap={1}>
       {icon}
       {loading ? (
-        <Skeleton width={120} />
+        <Skeleton width={100} />
       ) : (
         <Typography color="textSecondary">R${formattedValue}</Typography>
       )}
