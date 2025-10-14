@@ -6,20 +6,20 @@ export const StatementTableRowSkeleton = memo(
     return (
       <TableRow>
         <TableCell>
-          <Skeleton width="80%" />
+          <Skeleton width={140} />
         </TableCell>
         <TableCell>
-          <Skeleton width="80%" />
+          <Skeleton width={200} />
         </TableCell>
         <TableCell>
-          <Skeleton width="40%" />
-          <Skeleton width="20%" />
+          <Skeleton width={70} />
+          <Skeleton width={50} />
         </TableCell>
         <TableCell>
-          <Skeleton width="50%" />
+          <Skeleton width={150} />
         </TableCell>
         <TableCell>
-          <Skeleton width="70%" />
+          <Skeleton width={130} />
         </TableCell>
       </TableRow>
     );
